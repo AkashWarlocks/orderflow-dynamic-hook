@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.20;
 
 import {CounterHook} from "./CounterHook.sol";
 
@@ -9,7 +9,10 @@ import {Hooks} from "v4-core/libraries/Hooks.sol";
 import {PoolId, PoolIdLibrary} from "v4-core/types/PoolId.sol";
 
 contract CounterStub is CounterHook {
-    constructor(IPoolManager _poolManager, CounterHook addressToEtch) CounterHook(_poolManager) {}
+    constructor(
+        IPoolManager _poolManager,
+        CounterHook addressToEtch
+    ) CounterHook(_poolManager) {}
 
     function validateHookAddress(BaseHook _this) internal pure override {}
 
@@ -17,4 +20,3 @@ contract CounterStub is CounterHook {
     //     super._setTickLower(poolId, tickLower);
     // }
 }
-

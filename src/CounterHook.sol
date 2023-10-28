@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.20;
 
 import {BaseHook} from "periphery-next/BaseHook.sol";
 
@@ -27,36 +27,40 @@ contract CounterHook is BaseHook {
     constructor(IPoolManager _poolManager) BaseHook(_poolManager) {}
 
     function getHooksCalls() public pure override returns (Hooks.Calls memory) {
-        return Hooks.Calls({
-            beforeInitialize: false,
-            afterInitialize: false,
-            beforeModifyPosition: true,
-            afterModifyPosition: true,
-            beforeSwap: true,
-            afterSwap: true,
-            beforeDonate: false,
-            afterDonate: false
-        });
+        return
+            Hooks.Calls({
+                beforeInitialize: false,
+                afterInitialize: false,
+                beforeModifyPosition: true,
+                afterModifyPosition: true,
+                beforeSwap: true,
+                afterSwap: true,
+                beforeDonate: false,
+                afterDonate: false
+            });
     }
 
     // -----------------------------------------------
     // NOTE: see IHooks.sol for function documentation
     // -----------------------------------------------
 
-    function beforeSwap(address, PoolKey calldata key, IPoolManager.SwapParams calldata, bytes calldata)
-        external
-        override
-        returns (bytes4)
-    {
+    function beforeSwap(
+        address,
+        PoolKey calldata key,
+        IPoolManager.SwapParams calldata,
+        bytes calldata
+    ) external override returns (bytes4) {
         beforeSwapCount[key.toId()]++;
         return BaseHook.beforeSwap.selector;
     }
 
-    function afterSwap(address, PoolKey calldata key, IPoolManager.SwapParams calldata, BalanceDelta, bytes calldata)
-        external
-        override
-        returns (bytes4)
-    {
+    function afterSwap(
+        address,
+        PoolKey calldata key,
+        IPoolManager.SwapParams calldata,
+        BalanceDelta,
+        bytes calldata
+    ) external override returns (bytes4) {
         afterSwapCount[key.toId()]++;
         return BaseHook.afterSwap.selector;
     }
