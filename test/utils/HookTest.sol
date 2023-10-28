@@ -3,15 +3,15 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 
-import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
-import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
-import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolKey.sol";
-import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
-import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
-import {PoolDonateTest} from "@uniswap/v4-core/contracts/test/PoolDonateTest.sol";
+import {PoolManager} from "v4-minimal/contracts/PoolManager.sol";
+import {IPoolManager} from "v4-minimal/contracts/interfaces/IPoolManager.sol";
+import {PoolKey} from "v4-minimal/contracts/types/PoolKey.sol";
+import {PoolModifyPositionTest} from "v4-minimal/test/PoolModifyPositionTest.sol";
+import {PoolSwapTest} from "v4-minimal/test/PoolSwapTest.sol";
+import {PoolDonateTest} from "v4-minimal/test/PoolDonateTest.sol";
 
-import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
-import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
+import {TestERC20} from "v4-minimal/test/TestERC20.sol";
+import {TickMath} from "v4-minimal/contracts/libraries/TickMath.sol";
 
 /// @notice Contract to initialize some test helpers
 /// @dev Minimal initialization. Inheriting contract should set up pools and provision liquidity

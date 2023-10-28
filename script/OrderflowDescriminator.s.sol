@@ -3,8 +3,8 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "forge-std/Script.sol";
-import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
-import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
+import {Hooks} from "v4-minimal/contracts/libraries/Hooks.sol";
+import {IPoolManager} from "v4-minimal/contracts/interfaces/IPoolManager.sol";
 import {OrderflowDescriminator} from "../src/OrderflowDescriminator.sol";
 import {HookMiner} from "../test/utils/HookMiner.sol";
 

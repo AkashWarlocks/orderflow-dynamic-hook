@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {BaseHook} from "periphery-next/BaseHook.sol";
+import {BaseHook} from "v4-minimal/contracts/BaseHook.sol";
 
-import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
-import {Hooks} from "v4-core/libraries/Hooks.sol";
-import {PoolId, PoolIdLibrary} from "v4-core/types/PoolId.sol";
-import {PoolKey} from "v4-core/types/PoolKey.sol";
-import {FeeLibrary} from "v4-core/libraries/FeeLibrary.sol";
+import {IPoolManager} from "v4-minimal/contracts/interfaces/IPoolManager.sol";
+import {Hooks} from "v4-minimal/contracts/libraries/Hooks.sol";
+import {PoolId, PoolIdLibrary} from "v4-minimal/contracts/types/PoolId.sol";
+import {PoolKey} from "v4-minimal/contracts/types/PoolKey.sol";
+import {FeeLibrary} from "v4-minimal/contracts/libraries/FeeLibrary.sol";
 
-import {BalanceDelta} from "v4-core/types/BalanceDelta.sol";
+import {BalanceDelta} from "v4-minimal/contracts/types/BalanceDelta.sol";
 
 contract OrderflowDescriminator is BaseHook {
     using PoolIdLibrary for PoolKey;
@@ -29,7 +29,7 @@ contract OrderflowDescriminator is BaseHook {
 
     function getFee(
         address,
-        PoolKey calldata,
+        IPoolManager.PoolKey memory key,
         IPoolManager.SwapParams calldata,
         bytes calldata
     ) public view returns (uint24) {
@@ -58,9 +58,8 @@ contract OrderflowDescriminator is BaseHook {
 
     function beforeInitialize(
         address,
-        PoolKey calldata key,
-        uint160,
-        bytes calldata
+        IPoolManager.PoolKey memory key,
+        uint160
     ) external pure override returns (bytes4 selector) {
         if (!key.fee.isDynamicFee()) revert MustUseDynamicFee();
         return BaseHook.beforeInitialize.selector;
@@ -68,19 +67,17 @@ contract OrderflowDescriminator is BaseHook {
 
     function beforeSwap(
         address,
-        PoolKey calldata,
-        IPoolManager.SwapParams calldata,
-        bytes calldata
+        IPoolManager.PoolKey memory key,
+        IPoolManager.SwapParams calldata
     ) external override returns (bytes4) {
         return BaseHook.beforeSwap.selector;
     }
 
     function afterSwap(
         address swapper,
-        PoolKey calldata,
+        IPoolManager.PoolKey memory key,
         IPoolManager.SwapParams calldata,
-        BalanceDelta,
-        bytes calldata
+        BalanceDelta
     ) external override returns (bytes4) {
         globalUserSwapCount[swapper]++;
         return BaseHook.afterSwap.selector;

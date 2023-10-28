@@ -11,23 +11,22 @@ import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {TestERC20} from "v4-core/test/TestERC20.sol";
 
 // Libraries
-import {CurrencyLibrary, Currency} from "v4-core/types/Currency.sol";
-import {PoolId, PoolIdLibrary} from "v4-core/types/PoolId.sol";
-import {PoolKey} from "v4-core/types/PoolKey.sol";
-import {Hooks} from "v4-core/libraries/Hooks.sol";
-import {TickMath} from "v4-core/libraries/TickMath.sol";
-import {FeeLibrary} from "v4-core/libraries/FeeLibrary.sol";
+import {CurrencyLibrary, Currency} from "v4-minimal/contracts/types/Currency.sol";
+import {PoolId, PoolIdLibrary} from "v4-minimal/contracts/types/PoolId.sol";
+import {PoolKey} from "v4-minimal/contracts/types/PoolKey.sol";
+import {Hooks} from "v4-minimal/contracts/libraries/Hooks.sol";
+import {TickMath} from "v4-minimal/contracts/libraries/TickMath.sol";
+import {FeeLibrary} from "v4-minimal/contracts/libraries/FeeLibrary.sol";
 //import {Deployers} from "v4-core/test/foundry-tests/utils/Deployers.sol";
-import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol";
+import {Deployers} from "v4-minimal/test/Deployers.sol";
 // Interfaces
-import {IHooks} from "v4-core/interfaces/IHooks.sol";
-import {IERC20Minimal} from "v4-core/interfaces/external/IERC20Minimal.sol";
-import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
+import {IHooks} from "v4-minimal/contracts/interfaces/IHooks.sol";
+import {IERC20Minimal} from "v4-minimal/contracts/interfaces/external/IERC20Minimal.sol";
+import {IPoolManager} from "v4-minimal/contracts/interfaces/IPoolManager.sol";
 
 // Pool Manager related contracts
-import {PoolManager} from "v4-core/PoolManager.sol";
-import {PoolModifyPositionTest} from "v4-core/test/PoolModifyPositionTest.sol";
-import {PoolSwapTest} from "v4-core/test/PoolSwapTest.sol";
+import {PoolManager} from "v4-minimal/contracts/PoolManager.sol";
+import {PoolSwapTest} from "v4-minimal/test/PoolSwapTest.sol";
 
 // Our contracts
 import {HookTest} from "./utils/HookTest.sol";
@@ -39,7 +38,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
     using CurrencyLibrary for Currency;
 
     OrderflowDescriminator counter;
-    PoolKey poolKey;
+    IPoolManager.PoolKey poolKey;
     PoolId poolId;
 
     address LP = vm.addr(1);
@@ -75,7 +74,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         // Create the pool as LP
 
         vm.startPrank(LP);
-        poolKey = PoolKey({
+        poolKey = IPoolManager.PoolKey({
             currency0: Currency.wrap(address(token0)),
             currency1: Currency.wrap(address(token1)),
             fee: 3000 | FeeLibrary.DYNAMIC_FEE_FLAG,
@@ -84,7 +83,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         });
 
         poolId = poolKey.toId();
-        manager.initialize(poolKey, SQRT_RATIO_1_1, ZERO_BYTES);
+        manager.initialize(poolKey, SQRT_RATIO_1_1);
 
         // Provide liquidity to the pool
         modifyPositionRouter.modifyPosition(
