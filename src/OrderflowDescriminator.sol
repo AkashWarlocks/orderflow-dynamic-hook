@@ -12,7 +12,7 @@ import {FeeLibrary} from "v4-minimal/contracts/libraries/FeeLibrary.sol";
 import {BalanceDelta} from "v4-minimal/contracts/types/BalanceDelta.sol";
 
 contract OrderflowDescriminator is BaseHook {
-    using PoolIdLibrary for PoolKey;
+    using PoolIdLibrary for IPoolManager.PoolKey;
     using FeeLibrary for uint24;
 
     error MustUseDynamicFee();

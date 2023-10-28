@@ -22,7 +22,7 @@ import {BalanceDelta} from "./types/BalanceDelta.sol";
 
 /// @notice Holds the state for all pools
 contract PoolManager is IPoolManager, NoDelegateCall, ERC1155, IERC1155Receiver {
-    using PoolIdLibrary for PoolKey;
+    using PoolIdLibrary for IPoolManager.PoolKey;
     using SafeCast for *;
     using Pool for *;
     using Hooks for IHooks;
