@@ -38,7 +38,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
 
-    OrderflowDescriminator counter;
+    OrderflowDescriminator discriminator;
     PoolKey poolKey;
     PoolId poolId;
 
@@ -62,15 +62,15 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
             type(OrderflowDescriminator).creationCode,
             abi.encode(address(manager))
         );
-        counter = new OrderflowDescriminator{salt: salt}(
+        discriminator = new OrderflowDescriminator{salt: salt}(
             IPoolManager(address(manager))
         );
         require(
-            address(counter) == hookAddress,
+            address(discriminator) == hookAddress,
             "CounterTest: hook address mismatch"
         );
 
-        counter.setFee(123);
+        discriminator.setFee(123);
 
         // Create the pool as LP
 
@@ -80,7 +80,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
             currency1: Currency.wrap(address(token1)),
             fee: 3000 | FeeLibrary.DYNAMIC_FEE_FLAG,
             tickSpacing: 60,
-            hooks: IHooks(counter)
+            hooks: IHooks(discriminator)
         });
 
         poolId = poolKey.toId();
@@ -109,23 +109,29 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
     function testSwap() public {
         // positions were created in setup()
 
+        uint256 userSwapCountBefore = discriminator.globalUserSwapCount(
+            SWAPPER
+        );
+
+        console.log(userSwapCountBefore);
+        console.log(SWAPPER);
+
         uint256 balanceToken0Before = token0.balanceOf(SWAPPER);
         uint256 balanceToken1Before = token1.balanceOf(SWAPPER);
-
-        console.log(balanceToken0Before);
-        console.log(balanceToken1Before);
 
         // Perform a test swap //
         uint256 amount = 1 ether;
         bool zeroForOne = true;
+
+        // Prank EOA origin behaviour, used by hook to identify swapper
+        vm.prank(SWAPPER, SWAPPER);
         swap(poolKey, int256(amount), zeroForOne);
         // ------------------- //
 
+        uint256 userSwapCountAfter = discriminator.globalUserSwapCount(SWAPPER);
+
         uint256 balanceToken0After = token0.balanceOf(SWAPPER);
         uint256 balanceToken1After = token1.balanceOf(SWAPPER);
-
-        console.log(balanceToken0After);
-        console.log(balanceToken1After);
 
         console.log("Amount token0 in: %s", amount);
 
@@ -133,6 +139,8 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
             "Amount token1 received: %s",
             balanceToken1After - balanceToken1Before
         );
+
+        assertEq(userSwapCountAfter - userSwapCountBefore, 1);
 
         assertLt(balanceToken0After, balanceToken0Before);
         assertGt(balanceToken1After, balanceToken1Before);

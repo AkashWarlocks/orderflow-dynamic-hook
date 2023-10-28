@@ -76,13 +76,13 @@ contract OrderflowDescriminator is BaseHook {
     }
 
     function afterSwap(
-        address swapper,
+        address,
         PoolKey calldata,
         IPoolManager.SwapParams calldata,
         BalanceDelta,
         bytes calldata
     ) external override returns (bytes4) {
-        globalUserSwapCount[swapper]++;
+        globalUserSwapCount[tx.origin] += 1;
         return BaseHook.afterSwap.selector;
     }
 }
