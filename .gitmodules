@@ -7,3 +7,6 @@
 [submodule "lib/flare-foundry-periphery-package"]
 	path = lib/flare-foundry-periphery-package
 	url = https://github.com/flare-foundation/flare-foundry-periphery-package
+[submodule "lib/flare-foundry-starter"]
+	path = lib/flare-foundry-starter
+	url = https://github.com/flare-foundation/flare-foundry-starter
