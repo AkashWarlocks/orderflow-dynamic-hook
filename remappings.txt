@@ -12,3 +12,4 @@ periphery-next/=lib/periphery-next/contracts/
 solmate/=lib/periphery-next/lib/solmate/src/
 v4-core/=lib/periphery-next/lib/v4-core/contracts/
 v4-core-test/=lib/periphery-next/lib/v4-core/test/
+v4-minified=lib/v4-minified

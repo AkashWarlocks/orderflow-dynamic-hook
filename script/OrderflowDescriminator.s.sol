@@ -5,10 +5,10 @@ import "forge-std/Test.sol";
 import "forge-std/Script.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
-import {CounterHook} from "../src/CounterHook.sol";
+import {OrderflowDescriminator} from "../src/OrderflowDescriminator.sol";
 import {HookMiner} from "../test/utils/HookMiner.sol";
 
-contract CounterHookScript is Script {
+contract OrderflowDescriminatorScript is Script {
     address constant CREATE2_DEPLOYER =
         address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
 
@@ -31,13 +31,15 @@ contract CounterHookScript is Script {
             CREATE2_DEPLOYER,
             flags,
             1000,
-            type(CounterHook).creationCode,
+            type(OrderflowDescriminator).creationCode,
             abi.encode(address(manager))
         );
 
         // Deploy the hook using CREATE2
         vm.broadcast();
-        CounterHook hook = new CounterHook{salt: salt}(manager);
+        OrderflowDescriminator hook = new OrderflowDescriminator{salt: salt}(
+            manager
+        );
         console.log(hookAddress);
         require(address(hook) == hookAddress, "Script: hook address mismatch");
     }

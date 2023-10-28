@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.20;
 
-import {IHooks} from "../interfaces/IHooks.sol";
-import {FeeLibrary} from "../libraries/FeeLibrary.sol";
+import {IHooks} from '../interfaces/IHooks.sol';
+import {FeeLibrary} from '../libraries/FeeLibrary.sol';
 
 /// @notice V4 decides whether to invoke specific hooks by inspecting the leading bits of the address that
 /// the hooks contract is deployed to.
@@ -44,12 +44,14 @@ library Hooks {
     /// @dev calls param is memory as the function will be called from constructors
     function validateHookAddress(IHooks self, Calls memory calls) internal pure {
         if (
-            calls.beforeInitialize != shouldCallBeforeInitialize(self)
-                || calls.afterInitialize != shouldCallAfterInitialize(self)
-                || calls.beforeModifyPosition != shouldCallBeforeModifyPosition(self)
-                || calls.afterModifyPosition != shouldCallAfterModifyPosition(self)
-                || calls.beforeSwap != shouldCallBeforeSwap(self) || calls.afterSwap != shouldCallAfterSwap(self)
-                || calls.beforeDonate != shouldCallBeforeDonate(self) || calls.afterDonate != shouldCallAfterDonate(self)
+            calls.beforeInitialize != shouldCallBeforeInitialize(self) ||
+            calls.afterInitialize != shouldCallAfterInitialize(self) ||
+            calls.beforeModifyPosition != shouldCallBeforeModifyPosition(self) ||
+            calls.afterModifyPosition != shouldCallAfterModifyPosition(self) ||
+            calls.beforeSwap != shouldCallBeforeSwap(self) ||
+            calls.afterSwap != shouldCallAfterSwap(self) ||
+            calls.beforeDonate != shouldCallBeforeDonate(self) ||
+            calls.afterDonate != shouldCallAfterDonate(self)
         ) {
             revert HookAddressNotValid(address(self));
         }
@@ -59,12 +61,13 @@ library Hooks {
     /// @param hook The hook to verify
     function isValidHookAddress(IHooks hook, uint24 fee) internal pure returns (bool) {
         // If there is no hook contract set, then fee cannot be dynamic and there cannot be a hook fee on swap or withdrawal.
-        return address(hook) == address(0)
-            ? !fee.isDynamicFee() && !fee.hasHookSwapFee() && !fee.hasHookWithdrawFee()
-            : (
-                uint160(address(hook)) >= AFTER_DONATE_FLAG || fee.isDynamicFee() || fee.hasHookSwapFee()
-                    || fee.hasHookWithdrawFee()
-            );
+        return
+            address(hook) == address(0)
+                ? !fee.isDynamicFee() && !fee.hasHookSwapFee() && !fee.hasHookWithdrawFee()
+                : (uint160(address(hook)) >= AFTER_DONATE_FLAG ||
+                    fee.isDynamicFee() ||
+                    fee.hasHookSwapFee() ||
+                    fee.hasHookWithdrawFee());
     }
 
     function shouldCallBeforeInitialize(IHooks self) internal pure returns (bool) {

@@ -10,23 +10,15 @@ import {PoolKey} from "v4-core/types/PoolKey.sol";
 
 import {BalanceDelta} from "v4-core/types/BalanceDelta.sol";
 
-contract CounterHook is BaseHook {
+contract OrderflowDescriminator is BaseHook {
     using PoolIdLibrary for PoolKey;
-
-    // NOTE: ---------------------------------------------------------
-    // state variables should typically be unique to a pool
-    // a single hook contract should be able to service multiple pools
-    // ---------------------------------------------------------------
 
     uint24 internal fee;
 
-    mapping(PoolId => uint256 count) public beforeSwapCount;
-    mapping(PoolId => uint256 count) public afterSwapCount;
+    // Cross-pool user state
+    mapping(address user => uint256 swapCount) public globalUserSwapCount;
 
-    mapping(PoolId => uint256 count) public beforeModifyPositionCount;
-    mapping(PoolId => uint256 count) public afterModifyPositionCount;
-
-    /// @notice public for testing
+    /// @dev public for testing
     function setFee(uint24 _fee) public {
         fee = _fee;
     }
@@ -45,10 +37,10 @@ contract CounterHook is BaseHook {
     function getHooksCalls() public pure override returns (Hooks.Calls memory) {
         return
             Hooks.Calls({
-                beforeInitialize: false,
+                beforeInitialize: true,
                 afterInitialize: false,
-                beforeModifyPosition: true,
-                afterModifyPosition: true,
+                beforeModifyPosition: false,
+                afterModifyPosition: false,
                 beforeSwap: true,
                 afterSwap: true,
                 beforeDonate: false,
@@ -62,43 +54,21 @@ contract CounterHook is BaseHook {
 
     function beforeSwap(
         address,
-        PoolKey calldata key,
+        PoolKey calldata,
         IPoolManager.SwapParams calldata,
         bytes calldata
     ) external override returns (bytes4) {
-        beforeSwapCount[key.toId()]++;
         return BaseHook.beforeSwap.selector;
     }
 
     function afterSwap(
-        address,
-        PoolKey calldata key,
+        address swapper,
+        PoolKey calldata,
         IPoolManager.SwapParams calldata,
         BalanceDelta,
         bytes calldata
     ) external override returns (bytes4) {
-        afterSwapCount[key.toId()]++;
+        globalUserSwapCount[swapper]++;
         return BaseHook.afterSwap.selector;
-    }
-
-    function beforeModifyPosition(
-        address,
-        PoolKey calldata key,
-        IPoolManager.ModifyPositionParams calldata,
-        bytes calldata
-    ) external override returns (bytes4) {
-        beforeModifyPositionCount[key.toId()]++;
-        return BaseHook.beforeModifyPosition.selector;
-    }
-
-    function afterModifyPosition(
-        address,
-        PoolKey calldata key,
-        IPoolManager.ModifyPositionParams calldata,
-        BalanceDelta,
-        bytes calldata
-    ) external override returns (bytes4) {
-        afterModifyPositionCount[key.toId()]++;
-        return BaseHook.afterModifyPosition.selector;
     }
 }

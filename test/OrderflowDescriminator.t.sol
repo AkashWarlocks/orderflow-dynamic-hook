@@ -31,14 +31,14 @@ import {PoolSwapTest} from "v4-core/test/PoolSwapTest.sol";
 
 // Our contracts
 import {HookTest} from "./utils/HookTest.sol";
-import {CounterHook} from "../src/CounterHook.sol";
+import {OrderflowDescriminator} from "../src/OrderflowDescriminator.sol";
 import {HookMiner} from "./utils/HookMiner.sol";
 
-contract CounterTest is HookTest, Deployers, GasSnapshot {
+contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
 
-    CounterHook counter;
+    OrderflowDescriminator counter;
     PoolKey poolKey;
     PoolId poolId;
 
@@ -51,25 +51,26 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
 
         // Deploy the hook to an address with the correct flags
         uint160 flags = uint160(
-            Hooks.BEFORE_SWAP_FLAG |
-                Hooks.AFTER_SWAP_FLAG |
-                Hooks.BEFORE_MODIFY_POSITION_FLAG |
-                Hooks.AFTER_MODIFY_POSITION_FLAG
+            Hooks.BEFORE_INITIALIZE_FLAG |
+                Hooks.BEFORE_SWAP_FLAG |
+                Hooks.AFTER_SWAP_FLAG
         );
         (address hookAddress, bytes32 salt) = HookMiner.find(
             address(this),
             flags,
             0,
-            type(CounterHook).creationCode,
+            type(OrderflowDescriminator).creationCode,
             abi.encode(address(manager))
         );
-        counter = new CounterHook{salt: salt}(IPoolManager(address(manager)));
+        counter = new OrderflowDescriminator{salt: salt}(
+            IPoolManager(address(manager))
+        );
         require(
             address(counter) == hookAddress,
             "CounterTest: hook address mismatch"
         );
 
-        counter.setFee(100000);
+        counter.setFee(123);
 
         // Create the pool as LP
 
@@ -105,13 +106,8 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         vm.stopPrank();
     }
 
-    function testCounterHooks() public {
+    function testSwap() public {
         // positions were created in setup()
-        assertEq(counter.beforeModifyPositionCount(poolId), 3);
-        assertEq(counter.afterModifyPositionCount(poolId), 3);
-
-        assertEq(counter.beforeSwapCount(poolId), 0);
-        assertEq(counter.afterSwapCount(poolId), 0);
 
         uint256 balanceToken0Before = token0.balanceOf(SWAPPER);
         uint256 balanceToken1Before = token1.balanceOf(SWAPPER);
@@ -120,9 +116,9 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         console.log(balanceToken1Before);
 
         // Perform a test swap //
-        int256 amount = 10000000000;
+        uint256 amount = 1 ether;
         bool zeroForOne = true;
-        swap(poolKey, amount, zeroForOne);
+        swap(poolKey, int256(amount), zeroForOne);
         // ------------------- //
 
         uint256 balanceToken0After = token0.balanceOf(SWAPPER);
@@ -131,7 +127,14 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         console.log(balanceToken0After);
         console.log(balanceToken1After);
 
-        assertEq(counter.beforeSwapCount(poolId), 1);
-        assertEq(counter.afterSwapCount(poolId), 1);
+        console.log("Amount token0 in: %s", amount);
+
+        console.log(
+            "Amount token1 received: %s",
+            balanceToken1After - balanceToken1Before
+        );
+
+        assertLt(balanceToken0After, balanceToken0Before);
+        assertGt(balanceToken1After, balanceToken1Before);
     }
 }
