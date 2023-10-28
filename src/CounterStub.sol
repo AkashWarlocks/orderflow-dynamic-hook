@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.21;
 
-import {DynamicFeeHook} from "./DynamicFeeHook.sol";
 import {CounterHook} from "./CounterHook.sol";
 
 import {BaseHook} from "periphery-next/BaseHook.sol";
