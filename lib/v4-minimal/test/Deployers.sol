@@ -15,7 +15,7 @@ import {SortTokens} from "./SortTokens.sol";
 
 contract Deployers {
     using FeeLibrary for uint24;
-    using PoolIdLibrary for PoolKey;
+    using PoolIdLibrary for IPoolManager.PoolKey;
 
     bytes constant ZERO_BYTES = new bytes(0);
 
@@ -38,11 +38,11 @@ contract Deployers {
 
     function createPool(PoolManager manager, IHooks hooks, uint24 fee, uint160 sqrtPriceX96)
         private
-        returns (IPoolManager.PoolKey storage, PoolId)
+        returns (IPoolManager.PoolKey memory, PoolId)
     {
         MockERC20[] memory tokens = deployTokens(2, 2 ** 255);
         (Currency currency0, Currency currency1) = SortTokens.sort(tokens[0], tokens[1]);
-        IPoolManager.PoolKey storage key = IPoolManager.PoolKey({
+        IPoolManager.PoolKey memory key = IPoolManager.PoolKey({
             currency0:currency0, 
             currency1:currency1, 
             fee:fee, 
@@ -55,7 +55,7 @@ contract Deployers {
 
     function createFreshPool(IHooks hooks, uint24 fee, uint160 sqrtPriceX96)
         internal
-        returns (PoolManager manager, IPoolManager.PoolKey storage key, PoolId id)
+        returns (PoolManager manager, IPoolManager.PoolKey memory key, PoolId id)
     {
         manager = createFreshManager();
         (key, id) = createPool(manager, hooks, fee, sqrtPriceX96);

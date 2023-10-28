@@ -65,7 +65,7 @@ contract HookTest is Test {
     }
 
     function swap(
-        PoolKey memory key,
+        IPoolManager.PoolKey memory key,
         int256 amountSpecified,
         bool zeroForOne
     ) internal {

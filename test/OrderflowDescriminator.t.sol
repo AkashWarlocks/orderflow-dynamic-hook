@@ -34,7 +34,7 @@ import {OrderflowDescriminator} from "../src/OrderflowDescriminator.sol";
 import {HookMiner} from "./utils/HookMiner.sol";
 
 contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
-    using PoolIdLibrary for PoolKey;
+    using PoolIdLibrary for IPoolManager.PoolKey;
     using CurrencyLibrary for Currency;
 
     OrderflowDescriminator counter;
