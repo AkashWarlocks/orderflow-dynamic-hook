@@ -42,6 +42,9 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
     PoolKey poolKey;
     PoolId poolId;
 
+    address LP = vm.addr(1);
+    address SWAPPER = address(this);
+
     function setUp() public {
         // creates the pool manager, test tokens, and other utility routers
         HookTest.initHookTestEnv();
@@ -68,8 +71,9 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
 
         counter.setFee(100000);
 
-        // Create the pool
+        // Create the pool as LP
 
+        vm.startPrank(LP);
         poolKey = PoolKey({
             currency0: Currency.wrap(address(token0)),
             currency1: Currency.wrap(address(token1)),
@@ -98,6 +102,7 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
                 10 ether
             )
         );
+        vm.stopPrank();
     }
 
     function testCounterHooks() public {
@@ -108,8 +113,8 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         assertEq(counter.beforeSwapCount(poolId), 0);
         assertEq(counter.afterSwapCount(poolId), 0);
 
-        uint256 balanceToken0Before = token0.balanceOf(address(this));
-        uint256 balanceToken1Before = token1.balanceOf(address(this));
+        uint256 balanceToken0Before = token0.balanceOf(SWAPPER);
+        uint256 balanceToken1Before = token1.balanceOf(SWAPPER);
 
         console.log(balanceToken0Before);
         console.log(balanceToken1Before);
@@ -120,8 +125,8 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         swap(poolKey, amount, zeroForOne);
         // ------------------- //
 
-        uint256 balanceToken0After = token0.balanceOf(address(this));
-        uint256 balanceToken1After = token1.balanceOf(address(this));
+        uint256 balanceToken0After = token0.balanceOf(SWAPPER);
+        uint256 balanceToken1After = token1.balanceOf(SWAPPER);
 
         console.log(balanceToken0After);
         console.log(balanceToken1After);

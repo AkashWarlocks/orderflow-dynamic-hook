@@ -31,6 +31,10 @@ contract HookTest is Test {
         TestERC20 _tokenA = new TestERC20(amount);
         TestERC20 _tokenB = new TestERC20(amount);
 
+        address LP = vm.addr(1);
+        _tokenA.mint(LP, amount);
+        _tokenB.mint(LP, amount);
+
         // pools alphabetically sort tokens by address
         // so align `token0` with `pool.token0` for consistency
         if (address(_tokenA) < address(_tokenB)) {
@@ -49,13 +53,15 @@ contract HookTest is Test {
         swapRouter = new PoolSwapTest(IPoolManager(address(manager)));
         donateRouter = new PoolDonateTest(IPoolManager(address(manager)));
 
-        // Approve for liquidity provision
-        token0.approve(address(modifyPositionRouter), amount);
-        token1.approve(address(modifyPositionRouter), amount);
-
         // Approve for swapping
         token0.approve(address(swapRouter), amount);
         token1.approve(address(swapRouter), amount);
+
+        // Approve for liquidity provision on LP
+        vm.startPrank(LP);
+        token0.approve(address(modifyPositionRouter), amount);
+        token1.approve(address(modifyPositionRouter), amount);
+        vm.stopPrank();
     }
 
     function swap(
