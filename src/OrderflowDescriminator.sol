@@ -7,11 +7,15 @@ import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 import {Hooks} from "v4-core/libraries/Hooks.sol";
 import {PoolId, PoolIdLibrary} from "v4-core/types/PoolId.sol";
 import {PoolKey} from "v4-core/types/PoolKey.sol";
+import {FeeLibrary} from "v4-core/libraries/FeeLibrary.sol";
 
 import {BalanceDelta} from "v4-core/types/BalanceDelta.sol";
 
 contract OrderflowDescriminator is BaseHook {
     using PoolIdLibrary for PoolKey;
+    using FeeLibrary for uint24;
+
+    error MustUseDynamicFee();
 
     uint24 internal fee;
 
@@ -51,6 +55,16 @@ contract OrderflowDescriminator is BaseHook {
     // -----------------------------------------------
     // NOTE: see IHooks.sol for function documentation
     // -----------------------------------------------
+
+    function beforeInitialize(
+        address,
+        PoolKey calldata key,
+        uint160,
+        bytes calldata
+    ) external pure override returns (bytes4 selector) {
+        if (!key.fee.isDynamicFee()) revert MustUseDynamicFee();
+        return BaseHook.beforeInitialize.selector;
+    }
 
     function beforeSwap(
         address,
