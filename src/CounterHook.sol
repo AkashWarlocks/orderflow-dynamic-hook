@@ -18,11 +18,27 @@ contract CounterHook is BaseHook {
     // a single hook contract should be able to service multiple pools
     // ---------------------------------------------------------------
 
+    uint24 internal fee;
+
     mapping(PoolId => uint256 count) public beforeSwapCount;
     mapping(PoolId => uint256 count) public afterSwapCount;
 
     mapping(PoolId => uint256 count) public beforeModifyPositionCount;
     mapping(PoolId => uint256 count) public afterModifyPositionCount;
+
+    /// @notice public for testing
+    function setFee(uint24 _fee) public {
+        fee = _fee;
+    }
+
+    function getFee(
+        address,
+        PoolKey calldata,
+        IPoolManager.SwapParams calldata,
+        bytes calldata
+    ) public view returns (uint24) {
+        return fee;
+    }
 
     constructor(IPoolManager _poolManager) BaseHook(_poolManager) {}
 

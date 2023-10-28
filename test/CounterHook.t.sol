@@ -66,14 +66,18 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
             "CounterTest: hook address mismatch"
         );
 
+        counter.setFee(100000);
+
         // Create the pool
-        poolKey = PoolKey(
-            Currency.wrap(address(token0)),
-            Currency.wrap(address(token1)),
-            3000,
-            60,
-            IHooks(counter)
-        );
+
+        poolKey = PoolKey({
+            currency0: Currency.wrap(address(token0)),
+            currency1: Currency.wrap(address(token1)),
+            fee: 3000 | FeeLibrary.DYNAMIC_FEE_FLAG,
+            tickSpacing: 60,
+            hooks: IHooks(counter)
+        });
+
         poolId = poolKey.toId();
         manager.initialize(poolKey, SQRT_RATIO_1_1, ZERO_BYTES);
 
@@ -104,11 +108,23 @@ contract CounterTest is HookTest, Deployers, GasSnapshot {
         assertEq(counter.beforeSwapCount(poolId), 0);
         assertEq(counter.afterSwapCount(poolId), 0);
 
+        uint256 balanceToken0Before = token0.balanceOf(address(this));
+        uint256 balanceToken1Before = token1.balanceOf(address(this));
+
+        console.log(balanceToken0Before);
+        console.log(balanceToken1Before);
+
         // Perform a test swap //
-        int256 amount = 100;
+        int256 amount = 10000000000;
         bool zeroForOne = true;
         swap(poolKey, amount, zeroForOne);
         // ------------------- //
+
+        uint256 balanceToken0After = token0.balanceOf(address(this));
+        uint256 balanceToken1After = token1.balanceOf(address(this));
+
+        console.log(balanceToken0After);
+        console.log(balanceToken1After);
 
         assertEq(counter.beforeSwapCount(poolId), 1);
         assertEq(counter.afterSwapCount(poolId), 1);
