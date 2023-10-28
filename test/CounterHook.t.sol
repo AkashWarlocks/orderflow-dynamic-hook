@@ -31,7 +31,6 @@ import {PoolSwapTest} from "v4-core/test/PoolSwapTest.sol";
 
 // Our contracts
 import {HookTest} from "./utils/HookTest.sol";
-import {CounterStub} from "../src/CounterStub.sol";
 import {CounterHook} from "../src/CounterHook.sol";
 import {HookMiner} from "./utils/HookMiner.sol";
 
