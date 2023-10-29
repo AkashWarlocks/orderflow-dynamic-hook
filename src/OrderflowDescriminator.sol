@@ -190,6 +190,7 @@ contract OrderflowDescriminator is BaseHook {
                 console.log("Toxic transaction detected");
                 user.toxicSwapCount++;
             } else {
+                console.log("Non-toxic transaction");
                 user.positiveSwapCount++;
             }
             uint24 updatedUserFee = getFeeForUser(userAddress);

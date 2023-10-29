@@ -65,7 +65,6 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         );
 
         string memory symbol0 = token0.symbol();
-        console.log(symbol0);
         string memory symbol1 = token1.symbol();
 
         MockFtso mockFtso0 = new MockFtso(symbol0, 2);
