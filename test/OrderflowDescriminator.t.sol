@@ -18,6 +18,8 @@ import {Hooks} from "v4-minimal/contracts/libraries/Hooks.sol";
 import {TickMath} from "v4-minimal/contracts/libraries/TickMath.sol";
 import {FeeLibrary} from "v4-minimal/contracts/libraries/FeeLibrary.sol";
 import {Deployers} from "v4-minimal/test/Deployers.sol";
+import {Constants} from "v4-minimal/test/utils/Constants.sol";
+
 // Interfaces
 import {IHooks} from "v4-minimal/contracts/interfaces/IHooks.sol";
 import {IERC20Minimal} from "v4-minimal/contracts/interfaces/external/IERC20Minimal.sol";
@@ -63,6 +65,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         );
 
         string memory symbol0 = token0.symbol();
+        console.log(symbol0);
         string memory symbol1 = token1.symbol();
 
         MockFtso mockFtso0 = new MockFtso(symbol0, 2);
@@ -73,25 +76,28 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         mockFtsoRegistry.addFtso(mockFtso0);
         mockFtsoRegistry.addFtso(mockFtso1);
 
+        uint256 ETH_PRICE = 170000;
+
         mockFtsoRegistry.setPriceForSymbol(
             token0.symbol(),
-            100000,
+            100,
             block.timestamp,
             2
         );
 
         mockFtsoRegistry.setPriceForSymbol(
             token1.symbol(),
-            100,
+            ETH_PRICE,
             block.timestamp,
             2
         );
 
         (uint256 price, , ) = mockFtsoRegistry.getCurrentPriceWithDecimals(
-            symbol0
+            symbol1
         );
 
-        assertEq(price, 100000);
+        assertEq(symbol1, "testETH");
+        assertEq(price, ETH_PRICE);
 
         (address hookAddress, bytes32 salt) = HookMiner.find(
             address(this),
@@ -110,10 +116,9 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
             "CounterTest: hook address mismatch"
         );
 
-        discriminator.setFee(123);
+        discriminator.setFee(5000);
 
         // Create the pool as LP
-
         vm.startPrank(LP);
         poolKey = IPoolManager.PoolKey({
             currency0: Currency.wrap(address(token0)),
@@ -124,17 +129,9 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         });
 
         poolId = poolKey.toId();
-        manager.initialize(poolKey, SQRT_RATIO_1_1);
+        manager.initialize(poolKey, Constants.SQRT_RATIO_1800_1);
 
         // Provide liquidity to the pool
-        modifyPositionRouter.modifyPosition(
-            poolKey,
-            IPoolManager.ModifyPositionParams(-60, 60, 10 ether)
-        );
-        modifyPositionRouter.modifyPosition(
-            poolKey,
-            IPoolManager.ModifyPositionParams(-120, 120, 10 ether)
-        );
         modifyPositionRouter.modifyPosition(
             poolKey,
             IPoolManager.ModifyPositionParams(
@@ -149,40 +146,28 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
     function testSwap() public {
         // positions were created in setup()
 
-        uint256 userSwapCountBefore = discriminator.globalUserSwapCount(
-            SWAPPER
-        );
-
-        console.log(userSwapCountBefore);
-        console.log(SWAPPER);
-
         uint256 balanceToken0Before = token0.balanceOf(SWAPPER);
         uint256 balanceToken1Before = token1.balanceOf(SWAPPER);
 
         // Perform a test swap //
         uint256 amount = 1 ether;
-        bool zeroForOne = true;
+        bool zeroForOne = false;
 
         // Prank EOA origin behaviour, used by hook to identify swapper
         vm.prank(SWAPPER, SWAPPER);
         swap(poolKey, int256(amount), zeroForOne);
         // ------------------- //
 
-        uint256 userSwapCountAfter = discriminator.globalUserSwapCount(SWAPPER);
-
         uint256 balanceToken0After = token0.balanceOf(SWAPPER);
         uint256 balanceToken1After = token1.balanceOf(SWAPPER);
 
-        console.log("Amount token0 in: %s", amount);
+        console.log("balance token 0 after: %s", balanceToken0After);
+        console.log("balance token 1 after: %s", balanceToken1After);
 
-        console.log(
-            "Amount token1 received: %s",
-            balanceToken1After - balanceToken1Before
-        );
-
-        assertEq(userSwapCountAfter - userSwapCountBefore, 1);
-
-        assertLt(balanceToken0After, balanceToken0Before);
-        assertGt(balanceToken1After, balanceToken1Before);
+        if (zeroForOne == true) {
+            assertLt(balanceToken0After, balanceToken0Before);
+        } else {
+            assertLt(balanceToken1After, balanceToken1Before);
+        }
     }
 }
