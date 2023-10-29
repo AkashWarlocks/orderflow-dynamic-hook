@@ -48,6 +48,10 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         // creates the pool manager, test tokens, and other utility routers
         HookTest.initHookTestEnv();
 
+        // labels for stack traces
+        vm.label(LP, "LP");
+        vm.label(SWAPPER, "Swapper");
+
         // Deploy the hook to an address with the correct flags
         uint160 flags = uint160(
             Hooks.BEFORE_INITIALIZE_FLAG |

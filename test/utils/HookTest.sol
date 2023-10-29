@@ -10,7 +10,7 @@ import {PoolModifyPositionTest} from "v4-minimal/test/PoolModifyPositionTest.sol
 import {PoolSwapTest} from "v4-minimal/test/PoolSwapTest.sol";
 import {PoolDonateTest} from "v4-minimal/test/PoolDonateTest.sol";
 
-import {TestERC20} from "v4-minimal/test/TestERC20.sol";
+import {TestERC20} from "./TestERC20.sol";
 import {TickMath} from "v4-minimal/contracts/libraries/TickMath.sol";
 
 /// @notice Contract to initialize some test helpers
@@ -28,8 +28,8 @@ contract HookTest is Test {
 
     function initHookTestEnv() public {
         uint256 amount = 10 ** 20;
-        TestERC20 _tokenA = new TestERC20(amount);
-        TestERC20 _tokenB = new TestERC20(amount);
+        TestERC20 _tokenA = new TestERC20("Flare", "FLR", amount);
+        TestERC20 _tokenB = new TestERC20("USDC", "USDC", amount);
 
         address LP = vm.addr(1);
         _tokenA.mint(LP, amount);

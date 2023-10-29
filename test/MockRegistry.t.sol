@@ -9,7 +9,6 @@ import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {MockFtsoRegistry} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/mockContracts/MockFtsoRegistry.sol";
 import {MockFtso} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/mockContracts/MockFtso.sol";
 
-
 contract MockRegistry is Test {
     MockFtsoRegistry mockFtsoRegistry;
     MockFtso mockFtso;
@@ -19,19 +18,22 @@ contract MockRegistry is Test {
         mockFtsoRegistry = new MockFtsoRegistry();
     }
 
-    function testAddMockFtso () public {
+    function testAddMockFtso() public {
         uint256 index = mockFtsoRegistry.addFtso(mockFtso);
-        assertEq(0, index,"Invalid Index");
+        assertEq(0, index, "Invalid Index");
     }
 
     function testSetCurrentPriceForSymbol() public {
         uint256 timestamp = block.timestamp;
         mockFtsoRegistry.setPriceForSymbol("ETH", 1000, timestamp, 5);
-        (uint256 _price, uint256 _timestamp, uint256 _assetPriceUsdDecimals) = mockFtsoRegistry.getCurrentPriceWithDecimals("ETH");
+        (
+            uint256 _price,
+            uint256 _timestamp,
+            uint256 _assetPriceUsdDecimals
+        ) = mockFtsoRegistry.getCurrentPriceWithDecimals("ETH");
 
         assertEq(1000, _price, "Invalid Price");
         assertEq(timestamp, _timestamp, "Invalid timestamp");
         assertEq(5, _assetPriceUsdDecimals, "Invalid Decimals");
     }
-
 }
