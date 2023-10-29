@@ -151,7 +151,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
 
         // Perform a test swap //
         uint256 amount = 1 ether;
-        bool zeroForOne = true;
+        bool zeroForOne = false;
 
         // Prank EOA origin behaviour, used by hook to identify swapper
         vm.prank(SWAPPER, SWAPPER);
