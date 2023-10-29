@@ -37,10 +37,10 @@ contract OrderflowDescriminatorScript is Script {
 
         // Deploy the hook using CREATE2
         vm.broadcast();
-        OrderflowDescriminator hook = new OrderflowDescriminator{salt: salt}(
-            manager
-        );
-        console.log(hookAddress);
-        require(address(hook) == hookAddress, "Script: hook address mismatch");
+        // OrderflowDescriminator hook = new OrderflowDescriminator{salt: salt}(
+        //     manager
+        // );
+        // console.log(hookAddress);
+        // require(address(hook) == hookAddress, "Script: hook address mismatch");
     }
 }

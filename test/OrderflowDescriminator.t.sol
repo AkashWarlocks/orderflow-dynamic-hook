@@ -33,6 +33,9 @@ import {HookTest} from "./utils/HookTest.sol";
 import {OrderflowDescriminator} from "../src/OrderflowDescriminator.sol";
 import {HookMiner} from "./utils/HookMiner.sol";
 
+import {IFtsoRegistry} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/ftso/userInterfaces/IFtsoRegistry.sol";
+import {MockFtsoRegistry} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/mockContracts/MockFtsoRegistry.sol";
+
 contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for IPoolManager.PoolKey;
     using CurrencyLibrary for Currency;
@@ -61,8 +64,11 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
             type(OrderflowDescriminator).creationCode,
             abi.encode(address(manager))
         );
+        MockFtsoRegistry mockFtsoRegistry = new MockFtsoRegistry();
+
         discriminator = new OrderflowDescriminator{salt: salt}(
-            IPoolManager(address(manager))
+            IPoolManager(address(manager)),
+            IFtsoRegistry(address(mockFtsoRegistry))
         );
         require(
             address(discriminator) == hookAddress,
