@@ -117,16 +117,6 @@ contract OrderflowDescriminator is BaseHook {
             PoolIdLibrary.toId(poolKey_)
         );
 
-        console.log("sqrt price current %s", currentSqrtPriceX96);
-
-        // uint160 sqrtPriceX96After = SqrtPriceMath
-        //     .getNextSqrtPriceFromAmount0RoundingUp(
-        //         currentSqrtPriceX96,
-        //         liquidity,
-        //         uint256(swapParams_.amountSpecified),
-        //         swapParams_.zeroForOne
-        //     );
-
         uint256 priceBeforeSwap = _sqrtPriceX96ToUint(currentSqrtPriceX96, 18);
         console.log("Current pool price %s", priceBeforeSwap);
 
@@ -153,6 +143,7 @@ contract OrderflowDescriminator is BaseHook {
         uint256 oracleToken1PriceDecimalAdjusted = oracleToken1PriceUSD *
             10 ** (18 - quoteDecimalsToken1);
 
+        uint256 priceDiff = 0;
         if (swapParams_.zeroForOne == true) {
             uint256 onChainToken0PriceUSD = ((oracleToken1PriceDecimalAdjusted *
                 (1 * 10 ** 18)) / priceBeforeSwap);
@@ -161,11 +152,16 @@ contract OrderflowDescriminator is BaseHook {
                 onChainToken0PriceUSD
             );
 
-            console.log(tokenAddressSymbol[address0]);
             console.log(
                 "Token 0 in USD by oracle %s",
                 oracleToken0PriceDecimalAdjusted
             );
+
+            if (onChainToken0PriceUSD > oracleToken0PriceDecimalAdjusted) {
+                priceDiff =
+                    onChainToken0PriceUSD -
+                    oracleToken0PriceDecimalAdjusted;
+            }
         } else {
             uint256 onChainToken1PriceUSD = (oracleToken0PriceDecimalAdjusted *
                 priceBeforeSwap) / (10 ** 18);
@@ -174,11 +170,33 @@ contract OrderflowDescriminator is BaseHook {
                 onChainToken1PriceUSD
             );
 
-            console.log(tokenAddressSymbol[address1]);
             console.log(
                 "Token 1 in USD by oracle %s",
                 oracleToken1PriceDecimalAdjusted
             );
+            if (onChainToken1PriceUSD > oracleToken1PriceDecimalAdjusted) {
+                priceDiff =
+                    onChainToken1PriceUSD -
+                    oracleToken1PriceDecimalAdjusted;
+            }
+
+            address userAddress = tx.origin;
+            uint256 userFee = getFeeForUser(userAddress);
+            User storage user = users[userAddress];
+
+            // Check if arb would be profitable after fees for user
+            // TODO: This shuold check the pricediff in bps, not absoloute difference
+            if (priceDiff > userFee) {
+                console.log("Toxic transaction detected");
+                user.toxicSwapCount++;
+            } else {
+                user.positiveSwapCount++;
+            }
+            uint24 updatedUserFee = getFeeForUser(userAddress);
+
+            uint24 fee = updatedUserFee;
+            console.log("Fee charged to user: %s. Base fee is 3000 ", fee);
+            setFee(fee);
         }
 
         return BaseHook.beforeSwap.selector;
@@ -201,5 +219,38 @@ contract OrderflowDescriminator is BaseHook {
         uint256 numerator1 = uint256(sqrtPriceX96) * uint256(sqrtPriceX96);
         uint256 numerator2 = 10 ** decimalsToken0;
         return FullMath.mulDiv(numerator1, numerator2, 1 << 192);
+    }
+
+    function _getFeeAmplifier(
+        User memory user_
+    ) internal pure returns (int256) {
+        int256 feeAmplifier = 0;
+
+        // Calculate the ratio of toxic swaps to total swaps
+        uint256 totalSwaps = user_.toxicSwapCount + user_.positiveSwapCount;
+        if (totalSwaps > 0) {
+            uint256 toxicRatio = (user_.toxicSwapCount * 1000) / totalSwaps; // Multiplied by 1000 for precision
+            feeAmplifier += int256(toxicRatio) - 500; // Subtracting 500 to center around 0
+        }
+
+        return feeAmplifier;
+    }
+
+    function getFeeForUser(address user_) public view returns (uint24) {
+        User memory user = users[user_];
+        int256 amplifier = _getFeeAmplifier(user);
+
+        // for demo purposes
+        if (amplifier > 0) {
+            return uint24(6000);
+        } else {
+            return uint24(1000);
+        }
+        // int256 fee = BASE_FEE + amplifier;
+
+        // // minimum fee: 10 bps (0.1%)
+        // if (fee < 100) fee = 100;
+
+        // return uint256(fee);
     }
 }
