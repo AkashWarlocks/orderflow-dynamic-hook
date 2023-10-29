@@ -1,10 +1,15 @@
-## arbitrage-controller
+### ORDERFLOW Controller using Uniswap V4
 
-Full project description:
-https://ethglobal.com/showcase/arb-controller-dw3so
+## Description
+1. What is Toxic Flow
+2. Uniswap V4 hooks
+3. Flare blockchain PriceDataFeed
+4. Solution (Toxic Flow Detection and Dynamic Fee change)
+
 
 
 ## Deploy
 ```
-forge script script/DynamicFeeHook.s.sol --rpc-url <RPC> --private-key <KEY> --broadcast
+forge script script/MainDeploy.s.sol --rpc-url <RPC>  --broadcast
 ```
+

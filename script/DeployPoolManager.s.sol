@@ -13,7 +13,7 @@ contract DeployPoolManager is Script {
 
     function run() public {
         vm.startBroadcast();
-        PoolManager manager = new PoolManager(500000);
+        PoolManager manager = new PoolManager(500_000);
         console.log(address(manager));
         vm.stopBroadcast();
     }
