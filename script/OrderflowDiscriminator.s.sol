@@ -7,6 +7,8 @@ import {Hooks} from "v4-minimal/contracts/libraries/Hooks.sol";
 import {IPoolManager} from "v4-minimal/contracts/interfaces/IPoolManager.sol";
 import {OrderflowDescriminator} from "../src/OrderflowDescriminator.sol";
 import {HookMiner} from "../test/utils/HookMiner.sol";
+import {IFtsoRegistry} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/ftso/userInterfaces/IFtsoRegistry.sol";
+import {Constants} from "./Constants.sol";
 
 contract OrderflowDescriminatorScript is Script {
     address constant CREATE2_DEPLOYER =
@@ -15,32 +17,32 @@ contract OrderflowDescriminatorScript is Script {
     function setUp() public {}
 
     function run() public {
-        IPoolManager manager = IPoolManager(
-            payable(0xC7f2Cf4845C6db0e1a1e91ED41Bcd0FcC1b0E141)
-        );
+        IPoolManager manager = IPoolManager(payable(Constants.POOL_MANAGER));
 
         // hook contracts must have specific flags encoded in the address
         uint160 flags = uint160(
-            Hooks.BEFORE_SWAP_FLAG |
-                Hooks.AFTER_SWAP_FLAG |
-                Hooks.BEFORE_MODIFY_POSITION_FLAG |
-                Hooks.AFTER_MODIFY_POSITION_FLAG
+            Hooks.BEFORE_INITIALIZE_FLAG |
+                Hooks.BEFORE_SWAP_FLAG |
+                Hooks.AFTER_SWAP_FLAG
         );
+        // Create Instance of FtsoRegistry
+        IFtsoRegistry _ftsoRegistry = IFtsoRegistry(Constants.FTSO_REGISTRY);
         // Mine a salt that will produce a hook address with the correct flags
         (address hookAddress, bytes32 salt) = HookMiner.find(
             CREATE2_DEPLOYER,
             flags,
             1000,
             type(OrderflowDescriminator).creationCode,
-            abi.encode(address(manager))
+            abi.encode(address(manager), address(_ftsoRegistry))
         );
 
         // Deploy the hook using CREATE2
         vm.broadcast();
-        // OrderflowDescriminator hook = new OrderflowDescriminator{salt: salt}(
-        //     manager
-        // );
-        // console.log(hookAddress);
-        // require(address(hook) == hookAddress, "Script: hook address mismatch");
+        OrderflowDescriminator hook = new OrderflowDescriminator{salt: salt}(
+            manager,
+            _ftsoRegistry
+        );
+        console.log(hookAddress);
+        require(address(hook) == hookAddress, "Script: hook address mismatch");
     }
 }
