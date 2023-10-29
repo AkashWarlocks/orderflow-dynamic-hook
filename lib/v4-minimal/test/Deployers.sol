@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {MockERC20} from "./MockERC20.sol";
 import {Hooks} from "../contracts/libraries/Hooks.sol";
-import {Currency} from "../contracts/types/Currency.sol";
+import {Currency, CurrencyLibrary} from "../contracts/libraries/CurrencyLibrary.sol";
 import {IHooks} from "../contracts/interfaces/IHooks.sol";
 import {IPoolManager} from "../contracts/interfaces/IPoolManager.sol";
 import {PoolManager} from "../contracts/PoolManager.sol";
@@ -38,18 +38,18 @@ contract Deployers {
 
     function createPool(PoolManager manager, IHooks hooks, uint24 fee, uint160 sqrtPriceX96)
         private
-        returns (IPoolManager.PoolKey memory, PoolId)
+        returns (IPoolManager.PoolKey memory key, PoolId id)
     {
         MockERC20[] memory tokens = deployTokens(2, 2 ** 255);
         (Currency currency0, Currency currency1) = SortTokens.sort(tokens[0], tokens[1]);
-        IPoolManager.PoolKey memory key = IPoolManager.PoolKey({
+        key = IPoolManager.PoolKey({
             currency0:currency0, 
             currency1:currency1, 
             fee:fee, 
             tickSpacing:fee.isDynamicFee() ? int24(60) : int24(fee / 100 * 2), 
             hooks:hooks
         });
-        PoolId id = key.toId();
+        id = key.toId();
         manager.initialize(key, sqrtPriceX96);
     }
 
