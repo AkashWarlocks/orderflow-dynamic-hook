@@ -18,15 +18,16 @@ For example, say you provide 1 eth and 1000 usdc into a basic v2 pool and the ma
 Market making is not as simple as maximining volume and fees, we need to make sure that our orderflow is more positive/organic, and outweighs the toxic orderflow.
 A similar dynamic exists in CeFi, and market makers are able to adjust dynamic spreads on orderbooks. In defi however, fees have been static due to the way dex's are designed. Until now, with uniswap v4 hooks.
 
-3. Our hook
-We created a 
-
-5. Flare blockchain PriceDataFeed
+2. Our v4 hook.
+We have created a Uniswap v4 hook OrderflowDiscriminator that dynamically adjusts swap fees in response to a number of indicators of toxicity. We have taken some inspiration for the articles listed above and recommend giving them a read for more context. We've integrated flare's FTSO price feed with the hook, and with every swap, the beforeSwap callback uses oracle data to compute price deviations and detect toxic transactions that would incur a loss greater than the fee generated. In such cases we increase the fee accordingly to a reasonable extent. The goal is not too elimate all toxic flow, there is need for arbitrage, but this way we can limit the losses of LPs and make liquidity providing significantly more efficient - leading improved provision across markets.
 
 
 
-## Deploy
-```
-forge script script/MainDeploy.s.sol --rpc-url <RPC>  --broadcast
-```
+
+## Deployed addresses
+| Action      | Contract                                  | Address                                   | Transaction Hash                                                           |
+|-------------|-------------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|
+| Deploy      | Pool Manager                              | 0x22b8142D0BFfc5Ff3b9976dc3eb44e44866F00e4 | 0xfeb26ea0ca2f0ba72466eb829b92e356eb5b11486f01b024fa63840c1daa7a54 |
+| Deploy      | OrderDiscriminator Hook                   | 0x8ced766b88384EA3001D9744A0bcEFFb10B8159e | 0x8e0ef2b58a658f60807b504965e487bdc70d428fbcdb92c03e1446661b378cdb |
+
 
