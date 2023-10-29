@@ -76,7 +76,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         mockFtsoRegistry.addFtso(mockFtso0);
         mockFtsoRegistry.addFtso(mockFtso1);
 
-        uint256 ETH_PRICE = 170000;
+        uint256 ETH_PRICE = 195000;
 
         mockFtsoRegistry.setPriceForSymbol(
             token0.symbol(),
