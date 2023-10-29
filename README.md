@@ -26,7 +26,7 @@ https://snapshot.org/#/balancer.eth/proposal/0xd991e9f3c6edd148bd37c600d7ada3d28
 
 
 The script MainDeploy deploys everything and executes a swap with the hook active.
-Tests demo a toxic/positive trade and fee respones from the hook.
+Tests demo a toxic/positive trade and fee respones from the hook. We deployed a minimal version of the poolmanager that maintains core functionality, in order to fit within the bytecode size limit.
 
 
 ## Deployed addresses
