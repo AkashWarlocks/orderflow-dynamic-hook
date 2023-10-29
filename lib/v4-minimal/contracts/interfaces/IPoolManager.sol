@@ -56,7 +56,11 @@ interface IPoolManager is IERC1155 {
     /// @param tickUpper The upper tick of the position
     /// @param liquidityDelta The amount of liquidity that was added or removed
     event ModifyPosition(
-        PoolId indexed id, address indexed sender, int24 tickLower, int24 tickUpper, int256 liquidityDelta
+        PoolId indexed id,
+        address indexed sender,
+        int24 tickLower,
+        int24 tickUpper,
+        int256 liquidityDelta
     );
 
     /// @notice Emitted for swaps between currency0 and currency1
@@ -78,11 +82,19 @@ interface IPoolManager is IERC1155 {
         uint24 fee
     );
 
-    event ProtocolFeeUpdated(PoolId indexed id, uint8 protocolSwapFee, uint8 protocolWithdrawFee);
+    event ProtocolFeeUpdated(
+        PoolId indexed id,
+        uint8 protocolSwapFee,
+        uint8 protocolWithdrawFee
+    );
 
     event ProtocolFeeControllerUpdated(address protocolFeeController);
 
-    event HookFeeUpdated(PoolId indexed id, uint8 hookSwapFee, uint8 hookWithdrawFee);
+    event HookFeeUpdated(
+        PoolId indexed id,
+        uint8 hookSwapFee,
+        uint8 hookWithdrawFee
+    );
 
     /// @notice Returns the key for identifying a pool
     struct PoolKey {
@@ -108,7 +120,9 @@ interface IPoolManager is IERC1155 {
     function MIN_PROTOCOL_FEE_DENOMINATOR() external view returns (uint8);
 
     /// @notice Get the current value in slot0 of the given pool
-    function getSlot0(PoolId id)
+    function getSlot0(
+        PoolId id
+    )
         external
         view
         returns (
@@ -124,7 +138,13 @@ interface IPoolManager is IERC1155 {
     function reservesOf(Currency currency) external view returns (uint256);
 
     /// @notice Initialize the state for a given pool ID
-    function initialize(PoolKey memory key, uint160 sqrtPriceX96) external returns (int24 tick);
+    function initialize(
+        PoolKey memory key,
+        uint160 sqrtPriceX96
+    ) external returns (int24 tick);
+
+    /// @notice Get the current value of liquidity of the given pool
+    function getLiquidity(PoolId id) external view returns (uint128 liquidity);
 
     /// @notice Returns the count of nonzero deltas for the given locker ID
     /// @param id The ID of the locker
@@ -133,7 +153,10 @@ interface IPoolManager is IERC1155 {
     /// @notice Get the current delta for a given currency, and its position in the currencies touched array
     /// @param id The ID of the locker
     /// @param currency The currency for which to lookup the delta
-    function getCurrencyDelta(uint256 id, Currency currency) external view returns (int256);
+    function getCurrencyDelta(
+        uint256 id,
+        Currency currency
+    ) external view returns (int256);
 
     /// @notice All operations go through this function
     /// @param data Any data to pass to the callback, via `ILockCallback(msg.sender).lockCallback(data)`
@@ -149,7 +172,10 @@ interface IPoolManager is IERC1155 {
     }
 
     /// @notice Modify the position for the given pool
-    function modifyPosition(PoolKey memory key, ModifyPositionParams memory params) external returns (BalanceDelta);
+    function modifyPosition(
+        PoolKey memory key,
+        ModifyPositionParams memory params
+    ) external returns (BalanceDelta);
 
     struct SwapParams {
         bool zeroForOne;
@@ -158,10 +184,17 @@ interface IPoolManager is IERC1155 {
     }
 
     /// @notice Swap against the given pool
-    function swap(PoolKey memory key, SwapParams memory params) external returns (BalanceDelta);
+    function swap(
+        PoolKey memory key,
+        SwapParams memory params
+    ) external returns (BalanceDelta);
 
     /// @notice Donate the given currency amounts to the pool with the given pool key
-    function donate(PoolKey memory key, uint256 amount0, uint256 amount1) external returns (BalanceDelta);
+    function donate(
+        PoolKey memory key,
+        uint256 amount0,
+        uint256 amount1
+    ) external returns (BalanceDelta);
 
     /// @notice Called by the user to net out some value owed to the user
     /// @dev Can also be used as a mechanism for _free_ flash loans
