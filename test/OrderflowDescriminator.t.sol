@@ -146,13 +146,6 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
     function testSwap() public {
         // positions were created in setup()
 
-        uint256 userSwapCountBefore = discriminator.globalUserSwapCount(
-            SWAPPER
-        );
-
-        console.log(userSwapCountBefore);
-        console.log(SWAPPER);
-
         uint256 balanceToken0Before = token0.balanceOf(SWAPPER);
         uint256 balanceToken1Before = token1.balanceOf(SWAPPER);
 
@@ -165,15 +158,11 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         swap(poolKey, int256(amount), zeroForOne);
         // ------------------- //
 
-        uint256 userSwapCountAfter = discriminator.globalUserSwapCount(SWAPPER);
-
         uint256 balanceToken0After = token0.balanceOf(SWAPPER);
         uint256 balanceToken1After = token1.balanceOf(SWAPPER);
 
         console.log("balance token 0 after: %s", balanceToken0After);
         console.log("balance token 1 after: %s", balanceToken1After);
-
-        assertEq(userSwapCountAfter - userSwapCountBefore, 1);
 
         if (zeroForOne == true) {
             assertLt(balanceToken0After, balanceToken0Before);

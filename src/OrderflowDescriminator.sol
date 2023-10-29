@@ -31,10 +31,19 @@ contract OrderflowDescriminator is BaseHook {
     IPoolManager internal _poolManager;
     error MustUseDynamicFee();
 
+    // Fee in BPS
+    uint24 public constant BASE_FEE = 3000;
     uint24 internal _fee;
 
+    struct User {
+        uint256 positiveSwapCount;
+        uint256 toxicSwapCount;
+        uint256 transactionFrequency;
+        uint256 totalValueTraded;
+    }
+
     // Cross-pool user state
-    mapping(address user => uint256 swapCount) public globalUserSwapCount;
+    mapping(address => User) public users;
 
     /// @dev public for testing
     function setFee(uint24 fee_) public {
@@ -163,7 +172,7 @@ contract OrderflowDescriminator is BaseHook {
         IPoolManager.SwapParams calldata,
         BalanceDelta
     ) external override returns (bytes4) {
-        globalUserSwapCount[tx.origin] += 1;
+        users[tx.origin].positiveSwapCount += 1;
         return BaseHook.afterSwap.selector;
     }
 
