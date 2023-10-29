@@ -129,7 +129,7 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
         });
 
         poolId = poolKey.toId();
-        manager.initialize(poolKey, Constants.SQRT_RATIO_1800_1);
+        manager.initialize(poolKey, Constants.SQRT_RATIO_1_1900);
 
         // Provide liquidity to the pool
         modifyPositionRouter.modifyPosition(

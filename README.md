@@ -4,7 +4,7 @@
 1. What is Toxic Flow
 2. Uniswap V4 hooks
 3. Flare blockchain PriceDataFeed
-4. Solution
+4. Solution (Toxic Flow Detection and Dynamic Fee change)
 
 
 

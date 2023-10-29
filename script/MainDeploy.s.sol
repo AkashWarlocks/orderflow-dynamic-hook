@@ -106,7 +106,7 @@ contract MainDeploy is Hook, Deployers, GasSnapshot {
         });
 
         poolId = poolKey.toId();
-        manager.initialize(poolKey, Constants.SQRT_RATIO_1800_1);
+        manager.initialize(poolKey, Constants.SQRT_RATIO_1_1900);
         console.log("Liquidity Pool created: Along with beforeInitiale Hook");
 
         // Provide liquidity to the pool
@@ -131,14 +131,18 @@ contract MainDeploy is Hook, Deployers, GasSnapshot {
 
         // Perform a swap
         uint256 amount = 1 ether;
-        bool zeroForOne = false;
+        bool zeroForOne = true;
 
         swap(poolKey, int256(amount), zeroForOne);
+        vm.stopBroadcast();
 
-        uint256 balanceToken0After = token0.balanceOf(aSWAPPER);
-        uint256 balanceToken1After = token1.balanceOf(aSWAPPER);
+        vm.startBroadcast(aSWAPPER);
+        swap(poolKey, int256(amount), zeroForOne);
 
-        console.log("Amount token0 in: %s", amount);
+        // uint256 balanceToken0After = token0.balanceOf(aSWAPPER);
+        // uint256 balanceToken1After = token1.balanceOf(aSWAPPER);
+
+        // console.log("Amount token0 in: %s", amount);
 
         vm.stopBroadcast();
     }
