@@ -33,10 +33,7 @@ contract OrderflowDescriminator is BaseHook {
     }
 
     function getFee(
-        address,
-        IPoolManager.PoolKey memory key,
-        IPoolManager.SwapParams calldata,
-        bytes calldata
+        IPoolManager.PoolKey memory key
     ) public view returns (uint24) {
         return _fee;
     }
