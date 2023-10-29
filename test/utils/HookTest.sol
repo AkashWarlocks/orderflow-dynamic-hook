@@ -27,9 +27,9 @@ contract HookTest is Test {
     uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
 
     function initHookTestEnv() public {
-        uint256 amount = 10 ** 20;
-        TestERC20 _tokenA = new TestERC20("Flare", "FLR", amount);
-        TestERC20 _tokenB = new TestERC20("USDC", "USDC", amount);
+        uint256 amount = 10000000 ether;
+        TestERC20 _tokenA = new TestERC20("Wrapped Ether", "testETH", amount);
+        TestERC20 _tokenB = new TestERC20("USDC", "testUSDC", amount);
 
         address LP = vm.addr(1);
         _tokenA.mint(LP, amount);

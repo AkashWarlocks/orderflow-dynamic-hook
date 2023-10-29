@@ -7,7 +7,8 @@ library Constants {
     uint160 public constant SQRT_RATIO_1_4 = 39614081257132168796771975168;
     uint160 public constant SQRT_RATIO_2_1 = 112045541949572279837463876454;
     uint160 public constant SQRT_RATIO_4_1 = 158456325028528675187087900672;
-    uint160 public constant SQRT_RATIO_121_100 = 87150978765690771352898345369;
+    uint160 public constant SQRT_RATIO_121_100 = 1879646142286583960136943351;
+    uint160 public constant SQRT_RATIO_1800_1 = 3361366258487168395123916293647;
 
     uint256 constant MAX_UINT256 = type(uint256).max;
     uint128 constant MAX_UINT128 = type(uint128).max;
