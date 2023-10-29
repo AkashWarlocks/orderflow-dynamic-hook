@@ -17,7 +17,6 @@ import {PoolKey} from "v4-minimal/contracts/types/PoolKey.sol";
 import {Hooks} from "v4-minimal/contracts/libraries/Hooks.sol";
 import {TickMath} from "v4-minimal/contracts/libraries/TickMath.sol";
 import {FeeLibrary} from "v4-minimal/contracts/libraries/FeeLibrary.sol";
-//import {Deployers} from "v4-core/test/foundry-tests/utils/Deployers.sol";
 import {Deployers} from "v4-minimal/test/Deployers.sol";
 // Interfaces
 import {IHooks} from "v4-minimal/contracts/interfaces/IHooks.sol";
@@ -35,6 +34,7 @@ import {HookMiner} from "./utils/HookMiner.sol";
 
 import {IFtsoRegistry} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/ftso/userInterfaces/IFtsoRegistry.sol";
 import {MockFtsoRegistry} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/mockContracts/MockFtsoRegistry.sol";
+import {MockFtso} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/mockContracts/MockFtso.sol";
 
 contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
     using PoolIdLibrary for IPoolManager.PoolKey;
@@ -61,7 +61,37 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
                 Hooks.BEFORE_SWAP_FLAG |
                 Hooks.AFTER_SWAP_FLAG
         );
+
+        string memory symbol0 = token0.symbol();
+        string memory symbol1 = token1.symbol();
+
+        MockFtso mockFtso0 = new MockFtso(symbol0, 2);
+        MockFtso mockFtso1 = new MockFtso(symbol1, 2);
+
         MockFtsoRegistry mockFtsoRegistry = new MockFtsoRegistry();
+
+        mockFtsoRegistry.addFtso(mockFtso0);
+        mockFtsoRegistry.addFtso(mockFtso1);
+
+        mockFtsoRegistry.setPriceForSymbol(
+            token0.symbol(),
+            100000,
+            block.timestamp,
+            2
+        );
+
+        mockFtsoRegistry.setPriceForSymbol(
+            token1.symbol(),
+            100,
+            block.timestamp,
+            2
+        );
+
+        (uint256 price, , ) = mockFtsoRegistry.getCurrentPriceWithDecimals(
+            symbol0
+        );
+
+        assertEq(price, 100000);
 
         (address hookAddress, bytes32 salt) = HookMiner.find(
             address(this),
