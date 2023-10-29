@@ -39,7 +39,7 @@ Tests demo a toxic/positive trade and fee respones from the hook.
 
 -- Caveats: 
 
-Currently the FTSOs update irregularly. We assume that they will be updated reqularly in the future and will rely on other indicators beyond just the oracle price - pool price difference.
+Currently the FTSOs update irregularly. We assume that they will be updated reqularly in the future and the hook will rely on other indicators beyond just the oracle price to pool price difference.
 
 This will incur more gas costs on swaps, the v4 singleton poolmanager does offer significant gas optimizations however
 
