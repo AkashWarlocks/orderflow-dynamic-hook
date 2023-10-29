@@ -12,6 +12,11 @@ import {PoolKey} from "v4-minimal/contracts/types/PoolKey.sol";
 import {FeeLibrary} from "v4-minimal/contracts/libraries/FeeLibrary.sol";
 import {BalanceDelta} from "v4-minimal/contracts/types/BalanceDelta.sol";
 import {SqrtPriceMath} from "@uniswap/v4-core/contracts/libraries/SqrtPriceMath.sol";
+import {CurrencyLibrary, Currency} from "v4-minimal/contracts/libraries/CurrencyLibrary.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {IFtsoRegistry} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/ftso/userInterfaces/IFtsoRegistry.sol";
+//import {FtsoRegistry} from "@flarenetwork/flare-periphery-contracts/lib/flare-foundry-periphery-package/src/coston2/ftso/FtsoRegistry.sol";
 
 import "forge-std/console.sol";
 
@@ -19,6 +24,9 @@ contract OrderflowDescriminator is BaseHook {
     using PoolIdLibrary for IPoolManager.PoolKey;
     using FeeLibrary for uint24;
 
+    mapping(address => string) private tokenAddressSymbol;
+
+    IFtsoRegistry internal _ftsoRegistry;
     IPoolManager internal _poolManager;
     error MustUseDynamicFee();
 
@@ -38,8 +46,12 @@ contract OrderflowDescriminator is BaseHook {
         return _fee;
     }
 
-    constructor(IPoolManager poolManager_) BaseHook(poolManager) {
+    constructor(
+        IPoolManager poolManager_,
+        IFtsoRegistry ftsoRegistryAddress_
+    ) BaseHook(poolManager) {
         _poolManager = poolManager_;
+        _ftsoRegistry = ftsoRegistryAddress_;
     }
 
     function getHooksCalls() public pure override returns (Hooks.Calls memory) {
@@ -64,8 +76,22 @@ contract OrderflowDescriminator is BaseHook {
         address,
         IPoolManager.PoolKey memory key_,
         uint160
-    ) external pure override returns (bytes4 selector) {
+    ) external override returns (bytes4 selector) {
         if (!key_.fee.isDynamicFee()) revert MustUseDynamicFee();
+        // Get Currency0 and Currency1
+        address address0 = Currency.unwrap(key_.currency0);
+        address address1 = Currency.unwrap(key_.currency1);
+
+        ERC20 token0 = ERC20(address0);
+        ERC20 token1 = ERC20(address1);
+
+        // Get Symbol
+        string memory symbol0 = token0.symbol();
+        string memory symbol1 = token1.symbol();
+
+        tokenAddressSymbol[address0] = symbol0;
+        tokenAddressSymbol[address1] = symbol1;
+
         return BaseHook.beforeInitialize.selector;
     }
 
