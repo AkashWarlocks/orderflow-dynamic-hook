@@ -61,14 +61,15 @@ contract DescriminatorTest is HookTest, Deployers, GasSnapshot {
                 Hooks.BEFORE_SWAP_FLAG |
                 Hooks.AFTER_SWAP_FLAG
         );
+        MockFtsoRegistry mockFtsoRegistry = new MockFtsoRegistry();
+
         (address hookAddress, bytes32 salt) = HookMiner.find(
             address(this),
             flags,
             0,
             type(OrderflowDescriminator).creationCode,
-            abi.encode(address(manager))
+            abi.encode(address(manager), address(mockFtsoRegistry))
         );
-        MockFtsoRegistry mockFtsoRegistry = new MockFtsoRegistry();
 
         discriminator = new OrderflowDescriminator{salt: salt}(
             IPoolManager(address(manager)),
