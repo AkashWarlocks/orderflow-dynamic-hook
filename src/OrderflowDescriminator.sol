@@ -65,7 +65,7 @@ contract OrderflowDescriminator is BaseHook {
 
     function beforeInitialize(
         address,
-        IPoolManager.PoolKey memory key,
+        IPoolManager.PoolKey memory key_,
         uint160
     ) external pure override returns (bytes4 selector) {
         if (!key_.fee.isDynamicFee()) revert MustUseDynamicFee();
@@ -77,27 +77,27 @@ contract OrderflowDescriminator is BaseHook {
         IPoolManager.PoolKey memory poolKey_,
         IPoolManager.SwapParams calldata swapParams_
     ) external override returns (bytes4) {
-        PoolId poolId = PoolIdLibrary.toId(poolKey_);
-        uint128 liquidity = _poolManager.getLiquidity(poolId);
+        // PoolId poolId = PoolIdLibrary.toId(poolKey_);
+        // uint128 liquidity = _poolManager.getLiquidity(poolId);
 
-        (uint160 sqrtPriceX96, , , , , ) = _poolManager.getSlot0(
-            PoolIdLibrary.toId(poolKey_)
-        );
+        // (uint160 sqrtPriceX96, , , , , ) = _poolManager.getSlot0(
+        //     PoolIdLibrary.toId(poolKey_)
+        // );
 
-        uint160 nextSqrtPriceX96 = SqrtPriceMath
-            .getNextSqrtPriceFromAmount0RoundingUp(
-                sqrtPriceX96,
-                liquidity,
-                uint256(swapParams_.amountSpecified),
-                swapParams_.zeroForOne
-            );
+        // uint160 nextSqrtPriceX96 = SqrtPriceMath
+        //     .getNextSqrtPriceFromAmount0RoundingUp(
+        //         sqrtPriceX96,
+        //         liquidity,
+        //         uint256(swapParams_.amountSpecified),
+        //         swapParams_.zeroForOne
+        //     );
 
-        uint256 priceBeforeSwap = _getPrice(sqrtPriceX96);
-        uint256 priceAfterSwap = _getPrice(nextSqrtPriceX96);
+        // uint256 priceBeforeSwap = _getPrice(sqrtPriceX96);
+        // uint256 priceAfterSwap = _getPrice(nextSqrtPriceX96);
 
-        console.log(priceBeforeSwap);
-        console.log(priceAfterSwap);
-        console.log();
+        // console.log(priceBeforeSwap);
+        // console.log(priceAfterSwap);
+        // console.log();
 
         return BaseHook.beforeSwap.selector;
     }
