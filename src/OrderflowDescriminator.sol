@@ -143,10 +143,6 @@ contract OrderflowDescriminator is BaseHook {
         uint256 oracleToken0PriceDecimalAdjusted = oracleToken0PriceUSD *
             10 ** (18 - quoteDecimalsToken0);
 
-        uint256 onChainToken1PriceUSD = (oracleToken0PriceDecimalAdjusted *
-            priceBeforeSwap) / (10 ** 18);
-
-        console.log("Token 1 in USD through token 0 %s", onChainToken1PriceUSD);
         (
             uint256 oracleToken1PriceUSD,
             ,
@@ -157,11 +153,33 @@ contract OrderflowDescriminator is BaseHook {
         uint256 oracleToken1PriceDecimalAdjusted = oracleToken1PriceUSD *
             10 ** (18 - quoteDecimalsToken1);
 
-        console.log(tokenAddressSymbol[address1]);
-        console.log(
-            "Token 1 in USD by oracle %s",
-            oracleToken1PriceDecimalAdjusted
-        );
+        if (swapParams_.zeroForOne == true) {
+            uint256 onChainToken0PriceUSD = ((oracleToken1PriceDecimalAdjusted *
+                (1 * 10 ** 18)) / priceBeforeSwap);
+            console.log(
+                "Token 0 in USD through token 1 %s",
+                onChainToken0PriceUSD
+            );
+
+            console.log(tokenAddressSymbol[address0]);
+            console.log(
+                "Token 0 in USD by oracle %s",
+                oracleToken0PriceDecimalAdjusted
+            );
+        } else {
+            uint256 onChainToken1PriceUSD = (oracleToken0PriceDecimalAdjusted *
+                priceBeforeSwap) / (10 ** 18);
+            console.log(
+                "Token 1 in USD through token 0 %s",
+                onChainToken1PriceUSD
+            );
+
+            console.log(tokenAddressSymbol[address1]);
+            console.log(
+                "Token 1 in USD by oracle %s",
+                oracleToken1PriceDecimalAdjusted
+            );
+        }
 
         return BaseHook.beforeSwap.selector;
     }
