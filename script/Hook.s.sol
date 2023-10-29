@@ -27,9 +27,9 @@ contract Hook is Script {
     uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
 
     function initHookEnv() public {
-        uint256 amount = 10 ** 20;
-        TestERC20 _tokenA = new TestERC20("Flare", "FLR", amount);
-        TestERC20 _tokenB = new TestERC20("USDC", "USDC", amount);
+        uint256 amount = 2 ** 128;
+        TestERC20 _tokenA = new TestERC20("WrappedETH", "testETH", amount);
+        TestERC20 _tokenB = new TestERC20("USDC", "testUSDC", amount);
 
         _tokenA.mint(0xD2203c4bdB029aF733CFF2518F4e7E55cfF0eC49, amount);
         _tokenB.mint(0xD2203c4bdB029aF733CFF2518F4e7E55cfF0eC49, amount);
@@ -69,7 +69,7 @@ contract Hook is Script {
         int256 amountSpecified,
         bool zeroForOne
     ) internal {
-        uint256 amount = 10 ** 22;
+        uint256 amount = 2 ** 128;
 
         token0.approve(address(swapRouter), amount);
         token1.approve(address(swapRouter), amount);

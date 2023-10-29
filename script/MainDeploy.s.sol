@@ -18,6 +18,7 @@ import {Hooks} from "v4-minimal/contracts/libraries/Hooks.sol";
 import {TickMath} from "v4-minimal/contracts/libraries/TickMath.sol";
 import {FeeLibrary} from "v4-minimal/contracts/libraries/FeeLibrary.sol";
 import {Deployers} from "v4-minimal/test/Deployers.sol";
+import {Constants} from "v4-minimal/test/utils/Constants.sol";
 // Interfaces
 import {IHooks} from "v4-minimal/contracts/interfaces/IHooks.sol";
 import {IERC20Minimal} from "v4-minimal/contracts/interfaces/external/IERC20Minimal.sol";
@@ -105,18 +106,10 @@ contract MainDeploy is Hook, Deployers, GasSnapshot {
         });
 
         poolId = poolKey.toId();
-        manager.initialize(poolKey, SQRT_RATIO_1_1);
+        manager.initialize(poolKey, Constants.SQRT_RATIO_1800_1);
         console.log("Liquidity Pool created: Along with beforeInitiale Hook");
 
         // Provide liquidity to the pool
-        modifyPositionRouter.modifyPosition(
-            poolKey,
-            IPoolManager.ModifyPositionParams(-60, 60, 10 ether)
-        );
-        modifyPositionRouter.modifyPosition(
-            poolKey,
-            IPoolManager.ModifyPositionParams(-120, 120, 10 ether)
-        );
         modifyPositionRouter.modifyPosition(
             poolKey,
             IPoolManager.ModifyPositionParams(
@@ -129,19 +122,16 @@ contract MainDeploy is Hook, Deployers, GasSnapshot {
         vm.stopBroadcast();
 
         vm.startBroadcast(aSWAPPER);
-        uint256 userSwapCountBefore = discriminator.globalUserSwapCount(
-            aSWAPPER
-        );
 
-        console.log(userSwapCountBefore);
+        //console.log(userSwapCountBefore);
         console.log(aSWAPPER);
 
         uint256 balanceToken0Before = token0.balanceOf(aSWAPPER);
         uint256 balanceToken1Before = token1.balanceOf(aSWAPPER);
 
-        // Perform a test swap //
+        // Perform a swap
         uint256 amount = 1 ether;
-        bool zeroForOne = true;
+        bool zeroForOne = false;
 
         swap(poolKey, int256(amount), zeroForOne);
 
@@ -150,51 +140,6 @@ contract MainDeploy is Hook, Deployers, GasSnapshot {
 
         console.log("Amount token0 in: %s", amount);
 
-        console.log(
-            "Amount token1 received: %s",
-            balanceToken1After - balanceToken1Before
-        );
-
         vm.stopBroadcast();
     }
-
-    // function testSwap() public {
-    //     // positions were created in setup()
-
-    //     uint256 userSwapCountBefore = discriminator.globalUserSwapCount(
-    //         SWAPPER
-    //     );
-
-    //     console.log(userSwapCountBefore);
-    //     console.log(SWAPPER);
-
-    //     uint256 balanceToken0Before = token0.balanceOf(SWAPPER);
-    //     uint256 balanceToken1Before = token1.balanceOf(SWAPPER);
-
-    //     // Perform a test swap //
-    //     uint256 amount = 1 ether;
-    //     bool zeroForOne = true;
-
-    //     // Prank EOA origin behaviour, used by hook to identify swapper
-    //     //vm.create(SWAPPER, SWAPPER);
-    //     swap(poolKey, int256(amount), zeroForOne);
-    //     // ------------------- //
-
-    //     uint256 userSwapCountAfter = discriminator.globalUserSwapCount(SWAPPER);
-
-    //     uint256 balanceToken0After = token0.balanceOf(SWAPPER);
-    //     uint256 balanceToken1After = token1.balanceOf(SWAPPER);
-
-    //     console.log("Amount token0 in: %s", amount);
-
-    //     console.log(
-    //         "Amount token1 received: %s",
-    //         balanceToken1After - balanceToken1Before
-    //     );
-
-    //     // assertEq(userSwapCountAfter - userSwapCountBefore, 1);
-
-    //     // assertLt(balanceToken0After, balanceToken0Before);
-    //     // assertGt(balanceToken1After, balanceToken1Before);
-    // }
 }

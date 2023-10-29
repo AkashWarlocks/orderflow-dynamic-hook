@@ -28,18 +28,9 @@ contract DeployERC20Token is Script {
             token0 = address(tokenB);
             token1 = address(tokenA);
         }
-        console.log(address(token0));
-        console.log(address(token1));
 
         tokenA.mint(Constants.USER, amount);
         tokenB.mint(Constants.USER, amount);
-
-        // console.log(
-        //     "Balance=> TokenA: ",
-        //     _tokenA.balanceOf(Constants.USER),
-        //     " ,TokenB: ",
-        //     _tokenB.balanceOf(Constants.USER)
-        // );
 
         // APPROVE MANAGER FOR LP
         tokenA.approve(Constants.POOL_MANAGER, amount);

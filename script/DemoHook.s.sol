@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "forge-std/Script.sol";
+
 //import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
 import {PoolManager} from "v4-minimal/contracts/PoolManager.sol";
 import {IPoolManager} from "v4-minimal/contracts/interfaces/IPoolManager.sol";
@@ -56,8 +57,6 @@ contract DemoHook is Script {
             )
         );
 
-        // console.log(address(manager));
-        //console.log("ID: ", poolKey.toId());
         vm.stopBroadcast();
     }
 }
