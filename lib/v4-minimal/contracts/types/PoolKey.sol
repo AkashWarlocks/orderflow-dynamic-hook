@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.19;
 
-import {Currency} from "./Currency.sol";
+import {Currency} from "../libraries/CurrencyLibrary.sol";
 import {IHooks} from "../interfaces/IHooks.sol";
 
 /// @notice Returns the key for identifying a pool

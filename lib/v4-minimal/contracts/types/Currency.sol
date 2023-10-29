@@ -5,20 +5,6 @@ import {IERC20Minimal} from "../interfaces/external/IERC20Minimal.sol";
 
 type Currency is address;
 
-using {greaterThan as >, lessThan as <, equals as ==} for Currency global;
-
-function equals(Currency currency, Currency other) pure returns (bool) {
-    return Currency.unwrap(currency) == Currency.unwrap(other);
-}
-
-function greaterThan(Currency currency, Currency other) pure returns (bool) {
-    return Currency.unwrap(currency) > Currency.unwrap(other);
-}
-
-function lessThan(Currency currency, Currency other) pure returns (bool) {
-    return Currency.unwrap(currency) < Currency.unwrap(other);
-}
-
 /// @title CurrencyLibrary
 /// @dev This library allows for transferring and holding native tokens and ERC20 tokens
 library CurrencyLibrary {
@@ -34,7 +20,7 @@ library CurrencyLibrary {
 
     function transfer(Currency currency, address to, uint256 amount) internal {
         // implementation from
-        // https://github.com/transmissions11/solmate/blob/e8f96f25d48fe702117ce76c79228ca4f20206cb/src/utils/SafeTransferLib.sol
+        // https://github.com/transmissions11/solmate/blob/3c738133a0c1697096d63d28ef7a8ef298f9af6b/src/utils/SafeTransferLib.sol
 
         bool success;
         if (currency.isNative()) {
@@ -46,27 +32,25 @@ library CurrencyLibrary {
             if (!success) revert NativeTransferFailed();
         } else {
             assembly {
-                // We'll write our calldata to this slot below, but restore it later.
-                let memPointer := mload(0x40)
+                // Get a pointer to some free memory.
+                let freeMemoryPointer := mload(0x40)
 
                 // Write the abi-encoded calldata into memory, beginning with the function selector.
-                mstore(0, 0xa9059cbb00000000000000000000000000000000000000000000000000000000)
-                mstore(4, to) // Append the "to" argument.
-                mstore(36, amount) // Append the "amount" argument.
+                mstore(freeMemoryPointer, 0xa9059cbb00000000000000000000000000000000000000000000000000000000)
+                mstore(add(freeMemoryPointer, 4), to) // Append the "to" argument.
+                mstore(add(freeMemoryPointer, 36), amount) // Append the "amount" argument.
 
                 success :=
                     and(
                         // Set success to whether the call reverted, if not we check it either
                         // returned exactly 1 (can't just be non-zero data), or had no return data.
                         or(and(eq(mload(0), 1), gt(returndatasize(), 31)), iszero(returndatasize())),
-                        // We use 68 because that's the total length of our calldata (4 + 32 * 2)
-                        // Counterintuitively, this call() must be positioned after the or() in the
-                        // surrounding and() because and() evaluates its arguments from right to left.
-                        call(gas(), currency, 0, 0, 68, 0, 32)
+                        // We use 68 because the length of our calldata totals up like so: 4 + 32 * 2.
+                        // We use 0 and 32 to copy up to 32 bytes of return data into the scratch space.
+                        // Counterintuitively, this call must be positioned second to the or() call in the
+                        // surrounding and() call or else returndatasize() will be zero during the computation.
+                        call(gas(), currency, 0, freeMemoryPointer, 68, 0, 32)
                     )
-
-                mstore(0x60, 0) // Restore the zero slot to zero.
-                mstore(0x40, memPointer) // Restore the memPointer.
             }
 
             if (!success) revert ERC20TransferFailed();
@@ -81,12 +65,8 @@ library CurrencyLibrary {
         }
     }
 
-    function balanceOf(Currency currency, address owner) internal view returns (uint256) {
-        if (currency.isNative()) {
-            return owner.balance;
-        } else {
-            return IERC20Minimal(Currency.unwrap(currency)).balanceOf(owner);
-        }
+    function equals(Currency currency, Currency other) internal pure returns (bool) {
+        return Currency.unwrap(currency) == Currency.unwrap(other);
     }
 
     function isNative(Currency currency) internal pure returns (bool) {

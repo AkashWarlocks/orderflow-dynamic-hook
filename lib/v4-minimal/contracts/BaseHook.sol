@@ -5,7 +5,6 @@ import {Hooks} from "./libraries/Hooks.sol";
 import {IPoolManager} from "./interfaces/IPoolManager.sol";
 import {IHooks} from "./interfaces/IHooks.sol";
 import {BalanceDelta} from "./types/BalanceDelta.sol";
-import {PoolKey} from "./types/PoolKey.sol";
 
 abstract contract BaseHook is IHooks {
     error NotPoolManager();

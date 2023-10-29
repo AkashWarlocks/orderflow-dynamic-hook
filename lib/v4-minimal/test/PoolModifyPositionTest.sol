@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import {CurrencyLibrary, Currency} from "../contracts/types/Currency.sol";
+import {CurrencyLibrary, Currency} from "../contracts/libraries/CurrencyLibrary.sol";
 import {IERC20Minimal} from "../contracts/interfaces/external/IERC20Minimal.sol";
 
 import {ILockCallback} from "../contracts/interfaces/callback/ILockCallback.sol";

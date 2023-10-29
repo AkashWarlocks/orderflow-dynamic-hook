@@ -11,7 +11,7 @@ import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
 import {TestERC20} from "v4-core/test/TestERC20.sol";
 
 // Libraries
-import {CurrencyLibrary, Currency} from "v4-minimal/contracts/types/Currency.sol";
+import {CurrencyLibrary, Currency} from "v4-minimal/contracts/libraries/CurrencyLibrary.sol";
 import {PoolId, PoolIdLibrary} from "v4-minimal/contracts/types/PoolId.sol";
 import {PoolKey} from "v4-minimal/contracts/types/PoolKey.sol";
 import {Hooks} from "v4-minimal/contracts/libraries/Hooks.sol";
