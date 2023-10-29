@@ -18,7 +18,7 @@ For example, say you provide 1 eth and 1000 usdc into a basic v2 pool and the ma
 Market making is not as simple as maximining volume and fees, we need to make sure that our orderflow is more positive/organic, and outweighs the toxic orderflow.
 A similar dynamic exists in CeFi, and market makers are able to adjust dynamic spreads on orderbooks. In defi however, fees have been static due to the way dex's are designed. Until now, with uniswap v4 hooks.
 
-ä2. Our v4 hook.
+#2. Our v4 hook.
 We have created a Uniswap v4 hook OrderflowDiscriminator that dynamically adjusts swap fees in response to a number of indicators of toxicity. We have taken some inspiration for the articles listed above and recommend giving them a read for more context. We've integrated flare's FTSO price feed with the hook, and with every swap, the beforeSwap callback uses oracle data to compute price deviations and detect toxic transactions that would incur a loss greater than the fee generated. In such cases we increase the fee accordingly to a reasonable extent. The goal is not too elimate all toxic flow, there is need for arbitrage, but this way we can limit the losses of LPs and make liquidity providing significantly more efficient - leading improved provision across markets.
 
 The hook will be used my multiple pools, and we keep track of each users swaps across pools. We keep track of how many toxic/non-toxic trades they execute. A high frequency of trades and high ratio of toxic to non-toxic will lead to an increase on top of the default pool fee of 0.3%. We also encourage positive flow by lowering fees who show the opposite characterstics. The need for this dynamic is already made evident by examples like Balancer partnering with CowSwap to offer lower fees to the solvers as it is a large source of organic order-flow. (Just users wanting to go from one asset to another, not well informed arb bots):
@@ -35,4 +35,11 @@ Tests demo a toxic/positive trade and fee respones from the hook.
 | Deploy      | Pool Manager                              | 0x22b8142D0BFfc5Ff3b9976dc3eb44e44866F00e4 | 0xfeb26ea0ca2f0ba72466eb829b92e356eb5b11486f01b024fa63840c1daa7a54 |
 | Deploy      | OrderDiscriminator Hook                   | 0x8ced766b88384EA3001D9744A0bcEFFb10B8159e | 0x8e0ef2b58a658f60807b504965e487bdc70d428fbcdb92c03e1446661b378cdb |
 
+
+
+-- Caveats: 
+
+Currently the FTSOs update irregularly. We assume that they will be updated reqularly in the future and will rely on other indicators beyond just the oracle price - pool price difference.
+
+This will incur more gas costs on swaps, the v4 singleton poolmanager does offer significant gas optimizations however
 
